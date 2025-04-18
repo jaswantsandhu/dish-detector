@@ -1,5 +1,7 @@
 export interface Recipe {
   title: string
+  cuisine: string
+  dietary: string[]        // e.g. ["vegetarian", "lacto"]
   ingredients: string[]
   steps: string[]
 }
@@ -22,12 +24,21 @@ export async function analyseImageWith(
     images: [base64Image],
     prompt: `
       Identify all ingredients visible in this image, then suggest recipes that use exactly those ingredients.
-      Return ONLY a JSON object with this exact shape and no extra text:
+      For each recipe include:
+        - title
+        - cuisine (e.g. Italian, Indian, Mexican)
+        - dietary categories (e.g. vegetarian, vegan, lacto)
+        - ingredients list
+        - step-by-step instructions
+      Return ONLY a JSON object matching this shape, with no extra text:
+
       {
         "ingredients": [string, …],
         "recipes": [
           {
             "title": string,
+            "cuisine": string,
+            "dietary": [string, …],
             "ingredients": [string, …],
             "steps": [string, …]
           }
@@ -57,8 +68,6 @@ export async function analyseImageWith(
   } catch {
     throw new Error('Failed to parse JSON from DeepSeek response')
   }
-
-  console.log(parsed);
 
   return parsed
 }
